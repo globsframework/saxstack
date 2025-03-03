@@ -4,7 +4,7 @@
     <groupId>org.globsframework</groupId>
     <artifactId>saxstack</artifactId>
     <packaging>jar</packaging>
-    <version>4.1-SNAPSHOT</version>
+    <version>4.1</version>
     <name>SAXStack</name>
 
     <dependencies>
@@ -16,23 +16,12 @@
         </dependency>
     </dependencies>
 
-    <scm>
-        <connection>scm:git:git://github.com/MarcGuiot/saxstack.git</connection>
-        <developerConnection>scm:git:ssh://github.com:MarcGuiot/saxstack.git</developerConnection>
-        <url>https://github.com/MarcGuiot/saxstack.git</url>
-    </scm>
-
     <distributionManagement>
         <repository>
             <id>github</id>
-            <name>GitHub Packages</name>
+            <name>GitHub Globsframework Packages</name>
             <url>https://maven.pkg.github.com/${env.GITHUB_REPOSITORY}</url>
         </repository>
-        <snapshotRepository>
-            <id>github</id>
-            <name>GitHub Packages</name>
-            <url>https://maven.pkg.github.com/${env.GITHUB_REPOSITORY}</url>
-        </snapshotRepository>
     </distributionManagement>
 
     <licenses>
@@ -41,21 +30,6 @@
             <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
         </license>
     </licenses>
-
-    <developers>
-        <developer>
-            <name>Marc Guiot</name>
-            <id>mguiot</id>
-            <email>marc.dudoignon@gmail.com</email>
-            <timezone>+1</timezone>
-        </developer>
-        <developer>
-            <name>Regis Medina</name>
-            <id>rmedina</id>
-            <email>regis@regismedina.com</email>
-            <timezone>+1</timezone>
-        </developer>
-    </developers>
 
     <build>
         <plugins>
