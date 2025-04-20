@@ -7,11 +7,12 @@ import java.io.IOException;
  * It work like an iterator : hasNext is called, then if true, getNextTagName and process are called for the given
  * tag.
  * getNextTagName is call to allow this kind of Xml :
- * <root>
- * <A/>
- * <B/>
- * </root>
- * <p/>
+ * <code>
+ * &lt;root&gt;
+ * &lt;A/&gt;
+ * &lt;B/&gt;
+ * &lt;/root&gt;
+ * </code>;
  * Where A and B are represented by the same XmlNodeBuilder.
  */
 
@@ -22,7 +23,7 @@ public interface XmlNodeBuilder {
     String getNextTagName();
 
     /**
-     * @param tag is the current tag. it is possible to add attribute on the xml tag : <A attr='value'/>
+     * @param tag is the current tag. it is possible to add attribute on the xml tag : &lt;A attr='value'/&gt;
      *            if startChild is called the child tag must be closed before the
      * @return
      * @throws IOException

@@ -18,11 +18,11 @@ import java.io.Writer;
 
 /**
  * Built-in entity reference Replaces character
- * &amp;    &
- * &lt;     <
- * &gt;     >
- * &quot;   "
- * &apos;   '
+ * {@literal &amp;    & }
+ * {@literal &lt;     < }
+ * {@literal &gt;     > }
+ * {@literal &quot;   " }
+ * {@literal &apos;   ' }
  */
 public class XmlUtils {
     public static final int AMP_CHARACTER = '&';
