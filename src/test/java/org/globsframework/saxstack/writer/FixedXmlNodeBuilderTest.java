@@ -1,10 +1,14 @@
 package org.globsframework.saxstack.writer;
 
+import org.junit.Before;
+import org.junit.Test;
+
 import java.util.List;
 
 public class FixedXmlNodeBuilderTest extends SaxStackWriterTestCase {
 
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
         super.setUp();
         root = new Category("contacts",
                 new Contact[]{
@@ -15,6 +19,7 @@ public class FixedXmlNodeBuilderTest extends SaxStackWriterTestCase {
                 });
     }
 
+    @Test
     public void testPruneEmpry() throws Exception {
         checkOutput(new RootExporter(root, true),
                 "<contacts>" +
@@ -23,6 +28,7 @@ public class FixedXmlNodeBuilderTest extends SaxStackWriterTestCase {
                         "</contacts>");
     }
 
+    @Test
     public void testDoNotPruneEmpty() throws Exception {
         checkOutput(new RootExporter(root, false),
                 "<contacts>" +

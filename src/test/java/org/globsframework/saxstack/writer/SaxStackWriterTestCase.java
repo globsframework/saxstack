@@ -15,7 +15,7 @@ public abstract class SaxStackWriterTestCase {
     protected Category root;
 
     @Before
-    protected void setUp() throws Exception {
+    public void setUp() throws Exception {
         root = new Category("contacts",
                 new Contact[]{
                         new Contact("me", "512")

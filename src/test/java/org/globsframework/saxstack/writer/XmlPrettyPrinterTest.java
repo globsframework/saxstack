@@ -4,8 +4,11 @@ import java.io.StringWriter;
 
 import static org.junit.Assert.assertEquals;
 
+import org.junit.Test;
+
 public class XmlPrettyPrinterTest extends SaxStackWriterTestCase {
 
+    @Test
     public void test() throws Exception {
         StringWriter writer = new StringWriter();
         XmlPrettyPrinter.write(writer, new FixedXmlNodeBuilderTest.RootExporter(root, false), 1);
@@ -35,6 +38,7 @@ public class XmlPrettyPrinterTest extends SaxStackWriterTestCase {
     }
 
 
+    @Test
     public void testVeryLongIndent() throws Exception {
         Category root = new Category("root");
         Category tmp = root;

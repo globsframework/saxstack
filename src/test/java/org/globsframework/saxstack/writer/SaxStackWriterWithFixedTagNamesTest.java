@@ -3,7 +3,10 @@ package org.globsframework.saxstack.writer;
 import java.io.IOException;
 import java.util.List;
 
+import org.junit.Test;
+
 public class SaxStackWriterWithFixedTagNamesTest extends SaxStackWriterTestCase {
+    @Test
     public void testStandardOutput() throws Exception {
         checkOutput(new RootBuilder(root),
                 "<contacts>" +
@@ -21,6 +24,7 @@ public class SaxStackWriterWithFixedTagNamesTest extends SaxStackWriterTestCase 
                         "</contacts>");
     }
 
+    @Test
     public void testFilteredOutput() throws Exception {
         checkOutput(new RootBuilder(root),
                 "contacts/category/contact",
@@ -34,6 +38,7 @@ public class SaxStackWriterWithFixedTagNamesTest extends SaxStackWriterTestCase 
                         "</contacts>");
     }
 
+    @Test
     public void testFilteredOutputWithAllSubTree() throws Exception {
         checkOutput(new RootBuilder(root),
                 "contacts/category/*",
@@ -51,6 +56,7 @@ public class SaxStackWriterWithFixedTagNamesTest extends SaxStackWriterTestCase 
                         "</contacts>");
     }
 
+    @Test
     public void testFilterAttr() throws Exception {
         checkOutput(new RootBuilder(root),
                 "contacts/category[name]/contact[name,phone]",
@@ -75,10 +81,12 @@ public class SaxStackWriterWithFixedTagNamesTest extends SaxStackWriterTestCase 
                         "</contacts>");
     }
 
+    @Test
     public void testRootTagError() throws Exception {
         checkOutputIsEmpty(new RootBuilder(root), "unknown");
     }
 
+    @Test
     public void testEmptyFilter() throws Exception {
         checkOutputIsEmpty(new RootBuilder(root), "");
     }

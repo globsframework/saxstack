@@ -4,7 +4,10 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
+import org.junit.Test;
+
 public class SaxStackWriterWithVariableTagNamesTest extends SaxStackWriterTestCase {
+    @Test
     public void testStandardOutput() throws Exception {
         checkOutput(new RootBuilder(root),
                 "<contacts>" +
@@ -22,6 +25,7 @@ public class SaxStackWriterWithVariableTagNamesTest extends SaxStackWriterTestCa
                         "</contacts>");
     }
 
+    @Test
     public void testFilteredOutput() throws Exception {
         checkOutput(new RootBuilder(root),
                 "contacts/family/home/Bart",
@@ -52,6 +56,7 @@ public class SaxStackWriterWithVariableTagNamesTest extends SaxStackWriterTestCa
                         "</contacts>");
     }
 
+    @Test
     public void testFilterAttribut() throws Exception {
         checkOutput(new RootBuilder(root),
                 "contacts/family/home/Homer[]",
