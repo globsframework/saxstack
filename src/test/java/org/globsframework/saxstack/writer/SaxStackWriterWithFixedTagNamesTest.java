@@ -92,16 +92,18 @@ public class SaxStackWriterWithFixedTagNamesTest extends SaxStackWriterTestCase 
     }
 
     public static class RootBuilder implements XmlRootBuilder {
-        private Category root;
+        private final Category root;
 
         public RootBuilder(Category root) {
             this.root = root;
         }
 
+        @Override
         public String getTagName() {
             return "contacts";
         }
 
+        @Override
         public XmlNodeBuilder[] process(XmlTag rootTag) {
             return new XmlNodeBuilder[]{
                     new ContactBuilder(root.getContacts()),
@@ -110,13 +112,14 @@ public class SaxStackWriterWithFixedTagNamesTest extends SaxStackWriterTestCase 
         }
     }
 
-    public static class CategoryBuilder extends IteratorBasedXmlNodeBuilder {
-        public CategoryBuilder(List categories) {
+    public static class CategoryBuilder extends IteratorBasedXmlNodeBuilder<Category> {
+        public CategoryBuilder(List<Category> categories) {
             super("category", categories);
         }
 
+        @Override
         public XmlNodeBuilder[] processNext(XmlTag tag) throws IOException {
-            Category category = (Category) getNextItem();
+            Category category = getNextItem();
             tag.addAttribute("name", category.getName());
             if (category.getAdditionalInfo() != null) {
                 tag.addValue(category.getAdditionalInfo());
@@ -124,6 +127,7 @@ public class SaxStackWriterWithFixedTagNamesTest extends SaxStackWriterTestCase 
             return getChildren(category);
         }
 
+        @Override
         public void levelDone() {
         }
 
@@ -135,19 +139,21 @@ public class SaxStackWriterWithFixedTagNamesTest extends SaxStackWriterTestCase 
         }
     }
 
-    public static class ContactBuilder extends IteratorBasedXmlNodeBuilder {
+    public static class ContactBuilder extends IteratorBasedXmlNodeBuilder<Contact> {
 
-        public ContactBuilder(List categories) {
+        public ContactBuilder(List<Contact> categories) {
             super("contact", categories);
         }
 
+        @Override
         public XmlNodeBuilder[] processNext(XmlTag tag) throws IOException {
-            Contact contact = (Contact) getNextItem();
-            tag.addAttribute("name", contact.getName());
-            tag.addAttribute("phone", contact.getPhone());
+            Contact contact = getNextItem();
+            tag.addAttribute("name", contact.name());
+            tag.addAttribute("phone", contact.phone());
             return new XmlNodeBuilder[0];
         }
 
+        @Override
         public void levelDone() {
         }
     }

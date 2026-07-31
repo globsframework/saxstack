@@ -3,12 +3,12 @@ package org.globsframework.saxstack.parser;
 import org.globsframework.saxstack.utils.XmlUtils;
 import org.junit.Test;
 import org.xml.sax.Attributes;
-import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,7 +25,7 @@ public class SaxStackParserTest {
                                 "  <ptf:item>Baby food</ptf:item>" +
                                 "</root>"));
         assertEquals(1, node.children.size());
-        DummyXmlNode xmlNode = (DummyXmlNode) node.children.get(0);
+        DummyXmlNode xmlNode = node.children.get(0);
         assertEquals("item", xmlNode.name);
         assertEquals("aa", xmlNode.uri);
         assertEquals("ptf:item", xmlNode.fullName);
@@ -35,9 +35,10 @@ public class SaxStackParserTest {
         String name;
         String uri;
         String fullName;
-        List children = new ArrayList();
+        List<DummyXmlNode> children = new ArrayList<>();
         public String value;
 
+        @Override
         public XmlNode getSubNode(String childName, Attributes xmlAttrs, String uri, String fullName) {
             name = childName;
             this.uri = uri;
@@ -47,15 +48,17 @@ public class SaxStackParserTest {
             return child;
         }
 
+        @Override
         public void setValue(String value) {
             this.value = value;
         }
 
+        @Override
         public void complete() {
         }
 
         public DummyXmlNode get(int i) {
-            return (DummyXmlNode) children.get(0);
+            return children.get(0);
         }
     }
 
@@ -112,12 +115,10 @@ public class SaxStackParserTest {
     public void testWithExternalDTD() throws Exception {
         DummyXmlNode node = new DummyXmlNode();
         final InputStream inputStream =
-                new ByteArrayInputStream(new StringBuffer()
-                        .append("<?xml version='1.0' encoding='UTF-8'?>")
-                        .append("<!ELEMENT root (root*,item*)>")
-                        .append("<!ATTLIST root name CDATA #IMPLIED>")
-                        .append("<!ATTLIST root otherName CDATA #IMPLIED>")
-                        .toString().getBytes());
+                new ByteArrayInputStream(("<?xml version='1.0' encoding='UTF-8'?>" +
+                        "<!ELEMENT root (root*,item*)>" +
+                        "<!ATTLIST root name CDATA #IMPLIED>" +
+                        "<!ATTLIST root otherName CDATA #IMPLIED>").getBytes(StandardCharsets.UTF_8));
         SaxStackParser.parse(XmlUtils.getXmlReader(), node,
                 new StringReader(
                         "<?xml version='1.0' encoding='UTF-8'?>" +
@@ -127,11 +128,7 @@ public class SaxStackParserTest {
                                 "    <other/>" +
                                 "  </item>" +
                                 "</root>"),
-                new EntityResolver() {
-                    public InputSource resolveEntity(String publicId, String systemId) {
-                        return new InputSource(inputStream);
-                    }
-                });
+                (publicId, systemId) -> new InputSource(inputStream));
         DummyXmlNode childNode = node.get(0);
         childNode = childNode.get(0);
         assertEquals("other", childNode.name);

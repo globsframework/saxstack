@@ -25,8 +25,8 @@ public interface XmlNodeBuilder {
     /**
      * @param tag is the current tag. it is possible to add attribute on the xml tag : &lt;A attr='value'/&gt;
      *            if startChild is called the child tag must be closed before the
-     * @return
-     * @throws IOException
+     * @return the builders producing the children of this tag, an empty array if it has none
+     * @throws IOException if the underlying writer fails
      */
     XmlNodeBuilder[] processNext(XmlTag tag) throws IOException;
 

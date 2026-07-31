@@ -10,7 +10,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 
 public class XmlNodeToBuilder implements XmlNode {
-    private XmlTag xmlTag;
+    private final XmlTag xmlTag;
 
     public XmlNodeToBuilder(XmlTag xmlTag, Attributes xmlAttrs) throws IOException {
         this.xmlTag = xmlTag;
@@ -18,32 +18,20 @@ public class XmlNodeToBuilder implements XmlNode {
             return;
         }
         int attrCount = xmlAttrs.getLength();
-        Info attrs[] = new Info[attrCount];
+        Info[] attrs = new Info[attrCount];
         for (int i = 0; i < attrCount; i++) {
             attrs[i] = new Info(xmlAttrs.getLocalName(i), xmlAttrs.getValue(i));
         }
-        Arrays.sort(attrs, new Comparator() {
-            public int compare(Object o1, Object o2) {
-                return ((Info) o1).attrName.compareTo(((Info) o2).attrName);
-            }
-        });
-        for (int i = 0; i < attrs.length; i++) {
-            Info attr = attrs[i];
-            xmlTag.addAttribute(attr.attrName, attr.attrValue);
+        Arrays.sort(attrs, Comparator.comparing(Info::attrName));
+        for (Info attr : attrs) {
+            xmlTag.addAttribute(attr.attrName(), attr.attrValue());
         }
     }
 
-    static class Info {
-
-        public Info(String attrName, String attrValue) {
-            this.attrName = attrName;
-            this.attrValue = attrValue;
-        }
-
-        String attrName;
-        String attrValue;
+    record Info(String attrName, String attrValue) {
     }
 
+    @Override
     public XmlNode getSubNode(String childName, Attributes xmlAttrs, String uri, String fullName) {
         try {
             return new XmlNodeToBuilder(xmlTag.createChildTag(childName), xmlAttrs);
@@ -52,6 +40,7 @@ public class XmlNodeToBuilder implements XmlNode {
         }
     }
 
+    @Override
     public void setValue(String value) {
         try {
             xmlTag.addValue(value);
@@ -60,6 +49,7 @@ public class XmlNodeToBuilder implements XmlNode {
         }
     }
 
+    @Override
     public void complete() {
         try {
             xmlTag.end();

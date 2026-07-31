@@ -4,12 +4,13 @@ import java.io.IOException;
 import java.io.Writer;
 
 public class RootXmlTag extends AbstractRootXmlTag {
-    private Writer writer;
+    private final Writer writer;
 
     public RootXmlTag(Writer writer) {
         this.writer = writer;
     }
 
+    @Override
     public XmlTag createChildTag(String tagName) throws IOException {
         writer.write('<');
         writer.write(tagName);

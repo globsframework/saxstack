@@ -1,15 +1,19 @@
 package org.globsframework.saxstack.utils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class NodeType {
-    private String name;
-    private Map children = new HashMap();
-    private List attrs;
+    private final String name;
+    private final Map<String, NodeType> children = new HashMap<>();
+    private final List<String> attrs;
 
-    public NodeType(String name, Collection attrs) {
+    public NodeType(String name, Collection<String> attrs) {
         this.name = name;
-        this.attrs = new ArrayList(attrs);
+        this.attrs = new ArrayList<>(attrs);
     }
 
     public String getName() {
@@ -17,23 +21,22 @@ public class NodeType {
     }
 
     NodeType getChild(String name) {
-        return (NodeType) children.get(name);
+        return children.get(name);
     }
 
-    public NodeType getOrCreate(String name, Collection attrs) {
-        if (children.containsKey(name)) {
-            NodeType type = ((NodeType) children.get(name));
-            type.check(attrs);
-            return type;
+    public NodeType getOrCreate(String name, Collection<String> attrs) {
+        NodeType existing = children.get(name);
+        if (existing != null) {
+            existing.check(attrs);
+            return existing;
         }
         NodeType type = new NodeType(name, attrs);
         children.put(name, type);
         return type;
     }
 
-    private void check(Collection attrs) {
-        for (Iterator iterator = attrs.iterator(); iterator.hasNext(); ) {
-            String attr = (String) iterator.next();
+    private void check(Collection<String> attrs) {
+        for (String attr : attrs) {
             if (!this.attrs.contains(attr)) {
                 this.attrs.add(attr);
             }
@@ -41,10 +44,7 @@ public class NodeType {
     }
 
     public NodeType findChild(String name) {
-        if (children.containsKey(name)) {
-            return (NodeType) children.get(name);
-        }
-        return null;
+        return children.get(name);
     }
 
     public boolean containAttr(String name) {

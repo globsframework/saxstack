@@ -5,7 +5,7 @@ import org.junit.Test;
 import org.xml.sax.helpers.AttributesImpl;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertThrows;
 
 public class XmlUtilsTest {
     public static final String ATTR_NAME = "attr";
@@ -59,14 +59,10 @@ public class XmlUtilsTest {
     public void testGetIntAttrValue() throws Exception {
         checkGetIntAttrValue("12", 0, 12);
         checkGetIntAttrValue(null, 99, 99);
-        try {
-            checkGetIntAttrValue("xxx", 0, 0);
-            fail();
-        } catch (NumberFormatException e) {
-        }
+        assertThrows(NumberFormatException.class, () -> checkGetIntAttrValue("xxx", 0, 0));
     }
 
-    public void checkGetIntAttrValue(String value, int defaultValue, int expected) throws Exception {
+    public void checkGetIntAttrValue(String value, int defaultValue, int expected) {
         AttributesImpl attributes = createAttributes(ATTR_NAME, value);
         assertEquals(expected, XmlUtils.getIntAttrValue(ATTR_NAME, attributes, defaultValue));
     }
@@ -75,14 +71,10 @@ public class XmlUtilsTest {
     public void testGetDoubleAttrValue() throws Exception {
         checkGetDoubleAttrValue("12.3", 0, 12.3);
         checkGetDoubleAttrValue(null, 99.9, 99.9);
-        try {
-            checkGetDoubleAttrValue("xxx", 0, 0);
-            fail();
-        } catch (NumberFormatException e) {
-        }
+        assertThrows(NumberFormatException.class, () -> checkGetDoubleAttrValue("xxx", 0, 0));
     }
 
-    public void checkGetDoubleAttrValue(String value, double defaultValue, double expected) throws Exception {
+    public void checkGetDoubleAttrValue(String value, double defaultValue, double expected) {
         AttributesImpl attributes = createAttributes(ATTR_NAME, value);
         assertEquals(expected, XmlUtils.getDoubleAttrValue(ATTR_NAME, attributes, defaultValue), 0);
     }

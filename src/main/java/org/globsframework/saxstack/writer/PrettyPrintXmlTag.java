@@ -8,16 +8,17 @@ import java.io.Writer;
 // TODO: addCData
 
 public final class PrettyPrintXmlTag extends XmlTag {
+    private static final String EMPTY =
+            "                                                                                                            ";
+
+    private final Writer writer;
+    private final XmlTag parent;
+    private final int attributeCountOnLine;
     private String tagName;
-    private Writer writer;
-    private XmlTag parent;
     private boolean closed = false;
     private PrettyPrintXmlTag child;
     private int level;
     private int attributeCount;
-    private int attributeCountOnLine;
-    private static final String EMPTY =
-            "                                                                                                            ";
 
     PrettyPrintXmlTag(Writer writer, XmlTag parent, String tag, int level, int attributeCountOnLine) {
         this.attributeCountOnLine = attributeCountOnLine;
@@ -26,10 +27,12 @@ public final class PrettyPrintXmlTag extends XmlTag {
         init(tag, level);
     }
 
+    @Override
     public String getTagName() {
         return tagName;
     }
 
+    @Override
     public XmlTag addAttribute(String attrName, Object attrValue) throws IOException {
         if (attrValue == null) {
             return this;
@@ -61,10 +64,11 @@ public final class PrettyPrintXmlTag extends XmlTag {
         writer.write(EMPTY, 0, len);
     }
 
-    // TODO: renvoyer une interface limit�e puisqu'on ne peut plus faire addAttribute (closeSup d�j� fait)
+    // TODO: renvoyer une interface limitée puisqu'on ne peut plus faire addAttribute (closeSup déjà fait)
+    @Override
     public XmlTag addValue(String value) throws IOException {
-        value = value.replaceAll("\n", "").trim();
-        if (value.length() != 0) {
+        value = value.replace("\n", "").trim();
+        if (!value.isEmpty()) {
             closeAndIndent();
             writer.write(normalize(value));
         }
@@ -77,12 +81,14 @@ public final class PrettyPrintXmlTag extends XmlTag {
         writeSpace(level + 2);
     }
 
+    @Override
     public XmlTag addCDataValue(String value) throws IOException {
         closeAndIndent();
         writer.write(XmlUtils.addInCDataValue(value));
         return this;
     }
 
+    @Override
     public XmlTag createChildTag(String tagName) throws IOException {
         closeAndIndent();
         writer.write("<");
@@ -95,6 +101,7 @@ public final class PrettyPrintXmlTag extends XmlTag {
         return child;
     }
 
+    @Override
     public XmlTag end() throws IOException {
         if (closed) {
             writer.write("\n");
@@ -126,6 +133,7 @@ public final class PrettyPrintXmlTag extends XmlTag {
         return XmlUtils.convertEntities(value);
     }
 
+    @Override
     public XmlTag addXmlSubtree(String xml) throws IOException {
         closeSup();
         writer.write(xml);

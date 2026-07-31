@@ -11,27 +11,29 @@ import java.io.Writer;
 
 public class SaxStackWriter implements SaxStackBuilder {
     public static final String XML_HEADER = "<?xml version='1.0' encoding='UTF-8'?>";
-    Writer writer;
+    private final Writer writer;
 
     public SaxStackWriter(Writer writer) {
         this.writer = writer;
     }
 
+    @Override
     public void write(XmlRootBuilder xmlBuilder) throws IOException {
         write(xmlBuilder, new FilterNone());
         writer.flush();
     }
 
+    @Override
     public void write(XmlRootBuilder rootBuilder, Filter filter) throws IOException {
         XmlUtils.build(filter, rootBuilder, new RootXmlTag(writer));
         writer.flush();
     }
 
-    static public void write(Writer writer, XmlRootBuilder xmlBuilder, Filter filter) throws IOException {
+    public static void write(Writer writer, XmlRootBuilder xmlBuilder, Filter filter) throws IOException {
         new SaxStackWriter(writer).write(xmlBuilder, filter);
     }
 
-    static public void write(Writer writer, XmlRootBuilder rootBuilder) throws IOException {
+    public static void write(Writer writer, XmlRootBuilder rootBuilder) throws IOException {
         new SaxStackWriter(writer).write(rootBuilder, new FilterNone());
     }
 

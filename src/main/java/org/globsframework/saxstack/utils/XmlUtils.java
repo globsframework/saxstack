@@ -3,7 +3,14 @@ package org.globsframework.saxstack.utils;
 import org.globsframework.saxstack.parser.ExceptionHolder;
 import org.globsframework.saxstack.parser.SaxStackParser;
 import org.globsframework.saxstack.parser.XmlAttributeNotFoundException;
-import org.globsframework.saxstack.writer.*;
+import org.globsframework.saxstack.writer.Filter;
+import org.globsframework.saxstack.writer.FilterNone;
+import org.globsframework.saxstack.writer.NullXmlTag;
+import org.globsframework.saxstack.writer.PrettyPrintRootXmlTag;
+import org.globsframework.saxstack.writer.XmlNodeBuilder;
+import org.globsframework.saxstack.writer.XmlPrettyPrinter;
+import org.globsframework.saxstack.writer.XmlRootBuilder;
+import org.globsframework.saxstack.writer.XmlTag;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
@@ -42,7 +49,10 @@ public class XmlUtils {
     private static final String GT_ENTITY = "&gt;";
     private static final String QUOTE_ENTITY = "&quot;";
     private static final String APOS_ENTITY = "&apos;";
-    public static final String LINE_SEPARATOR = System.getProperty("line.separator");
+    public static final String LINE_SEPARATOR = System.lineSeparator();
+
+    private XmlUtils() {
+    }
 
     public static String getAttrValue(String xmlAttrName, Attributes xmlAttributes) throws XmlAttributeNotFoundException {
         String val = xmlAttributes.getValue(xmlAttrName);
@@ -62,43 +72,43 @@ public class XmlUtils {
 
     public static boolean getBooleanAttrValue(String xmlAttrName, Attributes xmlAttributes, boolean defaultValue) {
         String attrValue = getAttrValue(xmlAttrName, xmlAttributes, Boolean.toString(defaultValue));
-        return Boolean.valueOf(attrValue).booleanValue();
+        return Boolean.parseBoolean(attrValue);
     }
 
     public static int getIntAttrValue(String xmlAttrName, Attributes xmlAttributes, int defaultValue) throws NumberFormatException {
         String attrValue = getAttrValue(xmlAttrName, xmlAttributes, Integer.toString(defaultValue));
-        return Integer.valueOf(attrValue).intValue();
+        return Integer.parseInt(attrValue);
     }
 
     public static double getDoubleAttrValue(String xmlAttrName, Attributes xmlAttributes, double defaultValue) throws NumberFormatException {
         String attrValue = getAttrValue(xmlAttrName, xmlAttributes, Double.toString(defaultValue));
-        return Double.valueOf(attrValue).doubleValue();
+        return Double.parseDouble(attrValue);
     }
 
     public static String convertEntities(String text) {
-        if ("".equals(text.trim())) {
+        if (text.trim().isEmpty()) {
             return "";
         }
         if (text.indexOf(AMP_CHARACTER) != -1) {
-            text = text.replaceAll(AMP_STRING, AMP_ENTITY);
+            text = text.replace(AMP_STRING, AMP_ENTITY);
         }
         if (text.indexOf(APOS_CHARACTER) != -1) {
-            text = text.replaceAll(APOS_STRING, APOS_ENTITY);
+            text = text.replace(APOS_STRING, APOS_ENTITY);
         }
         if (text.indexOf(LT_CHARACTER) != -1) {
-            text = text.replaceAll(LT_STRING, LT_ENTITY);
+            text = text.replace(LT_STRING, LT_ENTITY);
         }
         if (text.indexOf(GT_CHARACTER) != -1) {
-            text = text.replaceAll(GT_STRING, GT_ENTITY);
+            text = text.replace(GT_STRING, GT_ENTITY);
         }
         if (text.indexOf(QUOTE_CHARACTER) != -1) {
-            text = text.replaceAll(QUOTE_STRING, QUOTE_ENTITY);
+            text = text.replace(QUOTE_STRING, QUOTE_ENTITY);
         }
         return text;
     }
 
     public static String addInCDataValue(String xmlString) {
-        return new StringBuffer("<![CDATA[").append(xmlString).append("]]>").toString();
+        return "<![CDATA[" + xmlString + "]]>";
     }
 
     public static String format(String input, XMLReader parser, int attributeCountOnLine) throws IOException {
@@ -131,8 +141,8 @@ public class XmlUtils {
 
     private static void write(XmlTag parentTag, XmlNodeBuilder[] xmlWriters, Filter filter)
             throws IOException {
-        for (int i = 0; i < xmlWriters.length; i++) {
-            write(parentTag, xmlWriters[i], filter);
+        for (XmlNodeBuilder xmlWriter : xmlWriters) {
+            write(parentTag, xmlWriter, filter);
         }
     }
 
@@ -156,9 +166,7 @@ public class XmlUtils {
         try {
             SAXParser parser = factory.newSAXParser();
             return parser.getXMLReader();
-        } catch (ParserConfigurationException e) {
-            throw new ExceptionHolder(e);
-        } catch (SAXException e) {
+        } catch (ParserConfigurationException | SAXException e) {
             throw new ExceptionHolder(e);
         }
     }

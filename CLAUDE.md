@@ -101,8 +101,15 @@ JUnit diff is readable.
 
 ## Code style
 
-This is deliberately old code: raw `List`/`Map`/`Iterator` (pre-generics), index `for` loops, `StringBuffer`,
-anonymous inner classes rather than lambdas. Match the surrounding style rather than modernizing drive-by;
-generic churn here would ripple into the four dependent repos for no functional gain.
+The code was pre-generics and has been modernized to the Java 17 baseline: generified collections everywhere
+(no raw types left), diamond, enhanced `for`, `StringBuilder`, `Deque` instead of `Stack`, `@Override` on every
+override, `final` on fields that never change, lambdas where the interface is functional, `String.replace` for
+literal replacements, multi-catch, try-with-resources. Keep it that way, and keep the compile warning-free
+under `-Xlint:all`.
+
+`IteratorBasedXmlNodeBuilder<T>` is the one generified *public* type — subclassing it raw still compiles, which
+is why the four dependent repos needed no change. Two things stay deliberately un-modernized: the reusable-tag
+invariant in `WriterXmlTag`/`PrettyPrintXmlTag` (see above), and the long concatenated XML literals in the
+tests — text blocks would change the expected whitespace the assertions depend on.
 
 `src/test/java/.../bench/ReadWriteBigFile.java` is a `main`-based throughput bench, not a test.

@@ -7,6 +7,7 @@ import java.util.List;
 
 public class FixedXmlNodeBuilderTest extends SaxStackWriterTestCase {
 
+    @Override
     @Before
     public void setUp() throws Exception {
         super.setUp();
@@ -40,18 +41,20 @@ public class FixedXmlNodeBuilderTest extends SaxStackWriterTestCase {
     }
 
     public static class RootExporter implements XmlRootBuilder {
-        private Category root;
-        private boolean pruneIfEmpty;
+        private final Category root;
+        private final boolean pruneIfEmpty;
 
         public RootExporter(Category root, boolean pruneIfEmpty) {
             this.root = root;
             this.pruneIfEmpty = pruneIfEmpty;
         }
 
+        @Override
         public String getTagName() {
             return "contacts";
         }
 
+        @Override
         public XmlNodeBuilder[] process(XmlTag rootTag) {
             return new XmlNodeBuilder[]{
                     new SaxStackWriterWithFixedTagNamesTest.ContactBuilder(root.getContacts()),
@@ -61,13 +64,14 @@ public class FixedXmlNodeBuilderTest extends SaxStackWriterTestCase {
     }
 
     static class CategoryBuilderWithContacts extends SaxStackWriterWithFixedTagNamesTest.CategoryBuilder {
-        private boolean pruneIfEmpty;
+        private final boolean pruneIfEmpty;
 
-        public CategoryBuilderWithContacts(List categories, boolean pruneIfEmpty) {
+        public CategoryBuilderWithContacts(List<Category> categories, boolean pruneIfEmpty) {
             super(categories);
             this.pruneIfEmpty = pruneIfEmpty;
         }
 
+        @Override
         protected XmlNodeBuilder[] getChildren(Category category) {
             return new XmlNodeBuilder[]{new FixedXmlNodeBuilder("contacts",
                     super.getChildren(category), pruneIfEmpty)};

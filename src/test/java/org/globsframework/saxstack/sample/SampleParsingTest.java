@@ -29,7 +29,7 @@ public class SampleParsingTest {
                         "  </contact>" +
                         "</contacts>";
 
-        List contacts = new ArrayList();
+        List<Contact> contacts = new ArrayList<>();
         ContactsNode root = new ContactsNode(contacts);
         SaxStackParser.parse(XmlUtils.getXmlReader(), new XmlBootstrapNode(root, "contacts"), new StringReader(input));
 
@@ -39,9 +39,9 @@ public class SampleParsingTest {
     }
 
     private static class Contact {
-        private String firstName;
-        private String lastName;
-        private List emails = new ArrayList();
+        private final String firstName;
+        private final String lastName;
+        private final List<String> emails = new ArrayList<>();
 
         public Contact(String firstName, String lastName) {
             this.firstName = firstName;
@@ -52,7 +52,7 @@ public class SampleParsingTest {
             emails.add(email);
         }
 
-        public List getEmails() {
+        public List<String> getEmails() {
             return emails;
         }
 
@@ -64,18 +64,20 @@ public class SampleParsingTest {
             return lastName;
         }
 
+        @Override
         public String toString() {
             return firstName + " " + lastName + " " + emails;
         }
     }
 
     private static class ContactsNode extends DefaultXmlNode {
-        private List contacts;
+        private final List<Contact> contacts;
 
-        public ContactsNode(List contacts) {
+        public ContactsNode(List<Contact> contacts) {
             this.contacts = contacts;
         }
 
+        @Override
         public XmlNode getSubNode(String childName, Attributes xmlAttrs, String uri, String fullName) {
             if (childName.equals("contact")) {
                 return new ContactNode(xmlAttrs, contacts);
@@ -85,15 +87,16 @@ public class SampleParsingTest {
     }
 
     private static class ContactNode extends DefaultXmlNode {
-        private Contact contact;
+        private final Contact contact;
 
-        public ContactNode(Attributes xmlAttrs, List contacts) {
+        public ContactNode(Attributes xmlAttrs, List<Contact> contacts) {
             String firstName = XmlUtils.getAttrValue("firstName", xmlAttrs, "");
             String lastName = XmlUtils.getAttrValue("lastName", xmlAttrs, "");
             contact = new Contact(firstName, lastName);
             contacts.add(contact);
         }
 
+        @Override
         public XmlNode getSubNode(String childName, Attributes xmlAttrs, String uri, String fullName) {
             if (childName.equals("email")) {
                 return new EmailNode(xmlAttrs, contact);

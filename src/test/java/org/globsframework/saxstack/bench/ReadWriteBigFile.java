@@ -9,15 +9,18 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 
 public class ReadWriteBigFile {
 
     public static void main(String[] args) throws IOException {
         XmlRootBuilder rootBuilder = new XmlRootBuilder() {
+            @Override
             public String getTagName() {
                 return "root";
             }
 
+            @Override
             public XmlNodeBuilder[] process(XmlTag rootTag) throws IOException {
                 return new XmlNodeBuilder[]{
                         new TestXmlNodeBuilder(6, 5)
@@ -28,17 +31,19 @@ public class ReadWriteBigFile {
         File file = File.createTempFile("testBigXml", ".xml");
 //    file.deleteOnExit();
         long start = System.currentTimeMillis();
-        SaxStackWriter.write(new BufferedWriter(new FileWriter(file)), rootBuilder);
+        try (Writer writer = new BufferedWriter(new FileWriter(file))) {
+            SaxStackWriter.write(writer, rootBuilder);
+        }
         System.out.println("ReadWriteBigFile.main " + file.getAbsolutePath());
         System.out.println("ReadWriteBigFile.main " + file.length() + " in " + (System.currentTimeMillis() - start));
     }
 
     private static class TestXmlNodeBuilder implements XmlNodeBuilder {
-        int level;
-        int count;
-        int tmpCount;
-        String name;
-        XmlNodeBuilder childs[];
+        private final int level;
+        private final int count;
+        private final String name;
+        private final XmlNodeBuilder[] childs;
+        private int tmpCount;
 
         public TestXmlNodeBuilder(int count, int level) {
             this.count = count;
@@ -54,14 +59,17 @@ public class ReadWriteBigFile {
             }
         }
 
+        @Override
         public boolean hasNext() {
             return tmpCount >= 0;
         }
 
+        @Override
         public String getNextTagName() {
             return name + "_" + tmpCount;
         }
 
+        @Override
         public XmlNodeBuilder[] processNext(XmlTag tag) throws IOException {
             tmpCount--;
             tag.addAttribute("AnAttribute", "some attr value");
@@ -71,6 +79,7 @@ public class ReadWriteBigFile {
             return childs;
         }
 
+        @Override
         public void levelDone() {
             tmpCount = count;
         }

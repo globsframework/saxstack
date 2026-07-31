@@ -25,14 +25,16 @@ public class DocReadSample {
     private static class ExtractValueXmlNode extends DefaultXmlNode {
         String data;
 
+        @Override
         public void setValue(String value) {
             data = value;
         }
     }
 
     private static class AnyXmlNode extends DefaultXmlNode {
-        List<ServerXmlNode> serverXmlNodeList = new ArrayList<ServerXmlNode>();
+        List<ServerXmlNode> serverXmlNodeList = new ArrayList<>();
 
+        @Override
         public XmlNode getSubNode(String childName, Attributes xmlAttrs, String uri, String fullName) {
             if (childName.equals("server")) {
                 ServerXmlNode node = new ServerXmlNode();
@@ -45,15 +47,17 @@ public class DocReadSample {
     }
 
     private static class ServerXmlNode extends DefaultXmlNode {
-        Map<String, String> config = new HashMap<String, String>();
+        Map<String, String> config = new HashMap<>();
         String current;
 
         ExtractValueXmlNode extractValueXmlNode = new ExtractValueXmlNode() {
+            @Override
             public void complete() {
                 config.put(current, data);
             }
         };
 
+        @Override
         public XmlNode getSubNode(String childName, Attributes xmlAttrs, String uri, String fullName) {
             current = childName;
             return extractValueXmlNode;

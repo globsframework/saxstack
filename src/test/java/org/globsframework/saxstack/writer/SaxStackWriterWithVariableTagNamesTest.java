@@ -70,16 +70,18 @@ public class SaxStackWriterWithVariableTagNamesTest extends SaxStackWriterTestCa
     }
 
     public static class RootBuilder implements XmlRootBuilder {
-        private Category root;
+        private final Category root;
 
         public RootBuilder(Category root) {
             this.root = root;
         }
 
+        @Override
         public String getTagName() {
             return "contacts";
         }
 
+        @Override
         public XmlNodeBuilder[] process(XmlTag rootTag) {
             return new XmlNodeBuilder[]{
                     new ContactBuilder(root.getContacts()),
@@ -89,24 +91,27 @@ public class SaxStackWriterWithVariableTagNamesTest extends SaxStackWriterTestCa
     }
 
     static class CategoryBuilder implements XmlNodeBuilder {
-        private Iterator categories;
+        private final Iterator<Category> categories;
         private Category current;
 
-        public CategoryBuilder(List categories) {
+        public CategoryBuilder(List<Category> categories) {
             this.categories = categories.iterator();
             if (this.categories.hasNext()) {
-                current = (Category) this.categories.next();
+                current = this.categories.next();
             }
         }
 
+        @Override
         public boolean hasNext() {
             return current != null;
         }
 
+        @Override
         public String getNextTagName() {
             return current.getName();
         }
 
+        @Override
         public XmlNodeBuilder[] processNext(XmlTag tag) throws IOException {
             try {
                 return new XmlNodeBuilder[]{
@@ -114,48 +119,45 @@ public class SaxStackWriterWithVariableTagNamesTest extends SaxStackWriterTestCa
                         new CategoryBuilder(current.getSubCategories())
                 };
             } finally {
-                if (categories.hasNext()) {
-                    current = (Category) categories.next();
-                } else {
-                    current = null;
-                }
+                current = categories.hasNext() ? categories.next() : null;
             }
         }
 
+        @Override
         public void levelDone() {
 
         }
     }
 
     static class ContactBuilder implements XmlNodeBuilder {
-        private Iterator contacts;
+        private final Iterator<Contact> contacts;
         private Contact current;
 
-        public ContactBuilder(List categories) {
+        public ContactBuilder(List<Contact> categories) {
             this.contacts = categories.iterator();
             if (contacts.hasNext()) {
-                current = (Contact) contacts.next();
+                current = contacts.next();
             }
         }
 
+        @Override
         public boolean hasNext() {
             return current != null;
         }
 
+        @Override
         public String getNextTagName() {
-            return current.getName();
+            return current.name();
         }
 
+        @Override
         public XmlNodeBuilder[] processNext(XmlTag tag) throws IOException {
-            tag.addAttribute("phone", current.getPhone());
-            if (contacts.hasNext()) {
-                current = (Contact) contacts.next();
-            } else {
-                current = null;
-            }
+            tag.addAttribute("phone", current.phone());
+            current = contacts.hasNext() ? contacts.next() : null;
             return new XmlNodeBuilder[0];
         }
 
+        @Override
         public void levelDone() {
         }
     }

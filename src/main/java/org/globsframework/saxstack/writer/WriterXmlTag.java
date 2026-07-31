@@ -8,9 +8,9 @@ import java.io.Writer;
 // TODO: addCData
 
 public final class WriterXmlTag extends XmlTag {
+    private final Writer writer;
+    private final XmlTag parent;
     private String tagName;
-    private Writer writer;
-    private XmlTag parent;
     private boolean closed = false;
     private WriterXmlTag child;
 
@@ -20,10 +20,12 @@ public final class WriterXmlTag extends XmlTag {
         init(tag);
     }
 
+    @Override
     public String getTagName() {
         return tagName;
     }
 
+    @Override
     public XmlTag addAttribute(String attrName, Object attrValue) throws IOException {
         if (attrValue == null) {
             return this;
@@ -39,19 +41,22 @@ public final class WriterXmlTag extends XmlTag {
         return this;
     }
 
-    // TODO: renvoyer une interface limit�e puisqu'on ne peut plus faire addAttribute (closeSup d�j� fait)
+    // TODO: renvoyer une interface limitée puisqu'on ne peut plus faire addAttribute (closeSup déjà fait)
+    @Override
     public XmlTag addValue(String value) throws IOException {
         closeSup();
         writer.write(normalize(value));
         return this;
     }
 
+    @Override
     public XmlTag addCDataValue(String value) throws IOException {
         closeSup();
         writer.write(XmlUtils.addInCDataValue(value));
         return this;
     }
 
+    @Override
     public XmlTag createChildTag(String tagName) throws IOException {
         closeSup();
         writer.write("<");
@@ -64,6 +69,7 @@ public final class WriterXmlTag extends XmlTag {
         return child;
     }
 
+    @Override
     public XmlTag end() throws IOException {
         if (closed) {
             writer.write("</");
@@ -91,6 +97,7 @@ public final class WriterXmlTag extends XmlTag {
         return XmlUtils.convertEntities(value);
     }
 
+    @Override
     public XmlTag addXmlSubtree(String xml) throws IOException {
         closeSup();
         writer.write(xml);

@@ -36,13 +36,13 @@ public class XmlTestUtils {
     }
 
     static String readerToString(Reader reader) throws IOException {
-        StringBuffer stringBuffer = new StringBuffer();
-        BufferedReader bufferedReaderA = new BufferedReader(reader);
-        String readingString = bufferedReaderA.readLine();
+        StringBuilder builder = new StringBuilder();
+        BufferedReader bufferedReader = new BufferedReader(reader);
+        String readingString = bufferedReader.readLine();
         while (readingString != null) {
-            stringBuffer.append(readingString);
-            readingString = bufferedReaderA.readLine();
+            builder.append(readingString);
+            readingString = bufferedReader.readLine();
         }
-        return stringBuffer.toString();
+        return builder.toString();
     }
 }

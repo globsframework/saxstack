@@ -1,11 +1,8 @@
 package org.globsframework.saxstack.utils;
 
+@FunctionalInterface
 public interface AttributeOrderProvider {
-    AttributeOrderProvider NULL_ATTRIBUTE = new AttributeOrderProvider() {
-        public String getOrderedAttribute(String xmlTagName) {
-            return null;
-        }
-    };
+    AttributeOrderProvider NULL_ATTRIBUTE = xmlTagName -> null;
 
     String getOrderedAttribute(String xmlTagName);
 }

@@ -13,13 +13,16 @@ public class SilentXmlNode implements XmlNode {
         return TYPE_NAME;
     }
 
+    @Override
     public XmlNode getSubNode(String childName, Attributes xmlAttrs, String uri, String fullName) {
         return this;
     }
 
+    @Override
     public void setValue(String value) {
     }
 
+    @Override
     public void complete() {
     }
 }

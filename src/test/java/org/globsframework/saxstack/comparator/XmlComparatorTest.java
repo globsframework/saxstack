@@ -271,7 +271,7 @@ public class XmlComparatorTest {
     }
 
     private void checkIsSubset(String expected, String actual) throws Exception {
-        assertTrue(XmlComparator.computeDiff(expected, actual, XmlUtils.getXmlReader()) == null);
+        assertNull(XmlComparator.computeDiff(expected, actual, XmlUtils.getXmlReader()));
     }
 
     private void checkNotASubset(String expected, String actual, String filteredActual) throws Exception {

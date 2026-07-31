@@ -7,6 +7,7 @@ import org.xml.sax.Attributes;
 public class BootstrapDomXmlNode implements XmlNode {
     private DomXmlNode child;
 
+    @Override
     public XmlNode getSubNode(String childName, Attributes xmlAttrs, String uri, String fullName) throws ExceptionHolder {
         if (child != null) {
             throw new RuntimeException("Only one child is allowed");
@@ -15,10 +16,12 @@ public class BootstrapDomXmlNode implements XmlNode {
         return child;
     }
 
+    @Override
     public void setValue(String value) throws ExceptionHolder {
         throw new RuntimeException("setValue not allowed on bootstrap node");
     }
 
+    @Override
     public void complete() throws ExceptionHolder {
     }
 

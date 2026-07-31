@@ -8,11 +8,15 @@ import org.globsframework.saxstack.writer.XmlTag;
 import org.xml.sax.Attributes;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class DomXmlNode implements XmlNode {
-    private Map attrs = new TreeMap();
-    private List children = new ArrayList();
+    private final Map<String, String> attrs = new TreeMap<>();
+    private final List<DomXmlNode> children = new ArrayList<>();
     private String text = "";
     private String xmlTagName = "";
 
@@ -26,20 +30,23 @@ public class DomXmlNode implements XmlNode {
     public DomXmlNode() {
     }
 
+    @Override
     public XmlNode getSubNode(String childName, Attributes xmlAttrs, String uri, String fullName) throws ExceptionHolder {
         DomXmlNode expectedXmlNode = new DomXmlNode(childName, xmlAttrs);
         children.add(expectedXmlNode);
         return expectedXmlNode;
     }
 
+    @Override
     public void setValue(String value) throws ExceptionHolder {
         text = XmlUtils.convertEntities(
-                value.replaceAll("\n", "")
-                        .replaceAll(XmlUtils.LINE_SEPARATOR, "")
-                        .replaceAll("[ ]+", " ")
+                value.replace("\n", "")
+                        .replace(XmlUtils.LINE_SEPARATOR, "")
+                        .replaceAll(" +", " ")
                         .trim());
     }
 
+    @Override
     public void complete() throws ExceptionHolder {
     }
 
@@ -50,12 +57,9 @@ public class DomXmlNode implements XmlNode {
         if (!text.equals(actualRoot.text)) {
             return false;
         }
-        for (Iterator iterator = attrs.entrySet().iterator(); iterator.hasNext(); ) {
-            Map.Entry o = (Map.Entry) iterator.next();
-            if (!actualRoot.attrs.containsKey(o.getKey())) {
-                return false;
-            }
-            if (!actualRoot.attrs.get(o.getKey()).equals(o.getValue())) {
+        for (Map.Entry<String, String> attr : attrs.entrySet()) {
+            String actualValue = actualRoot.attrs.get(attr.getKey());
+            if (actualValue == null || !actualValue.equals(attr.getValue())) {
                 return false;
             }
         }
@@ -63,12 +67,10 @@ public class DomXmlNode implements XmlNode {
             return false;
         }
 
-        List tempList = new ArrayList(actualRoot.children);
-        for (Iterator iterator = children.iterator(); iterator.hasNext(); ) {
-            DomXmlNode expected = (DomXmlNode) iterator.next();
-            for (Iterator actualIterator = tempList.iterator(); actualIterator.hasNext(); ) {
-                DomXmlNode actual = (DomXmlNode) actualIterator.next();
-                if (expected.contains(actual)) {
+        List<DomXmlNode> tempList = new ArrayList<>(actualRoot.children);
+        for (DomXmlNode expected : children) {
+            for (Iterator<DomXmlNode> actualIterator = tempList.iterator(); actualIterator.hasNext(); ) {
+                if (expected.contains(actualIterator.next())) {
                     actualIterator.remove();
                     break;
                 }
@@ -79,37 +81,41 @@ public class DomXmlNode implements XmlNode {
 
     public XmlRootBuilder getBuilder() {
         return new XmlRootBuilder() {
+            @Override
             public String getTagName() {
                 return DomXmlNode.this.xmlTagName;
             }
 
+            @Override
             public XmlNodeBuilder[] process(XmlTag rootTag) throws IOException {
                 DomXmlNodeBuilder.dumpAttributes(rootTag, DomXmlNode.this.attrs);
-                Iterator children = DomXmlNode.this.children.iterator();
                 return new XmlNodeBuilder[]{
-                        new DomXmlNodeBuilder(children)
+                        new DomXmlNodeBuilder(DomXmlNode.this.children.iterator())
                 };
             }
         };
     }
 
     private static class DomXmlNodeBuilder implements XmlNodeBuilder {
-        private final Iterator children;
+        private final Iterator<DomXmlNode> children;
         private DomXmlNode child;
 
-        public DomXmlNodeBuilder(Iterator children) {
+        public DomXmlNodeBuilder(Iterator<DomXmlNode> children) {
             this.children = children;
         }
 
+        @Override
         public boolean hasNext() {
             return children.hasNext();
         }
 
+        @Override
         public String getNextTagName() {
-            child = (DomXmlNode) children.next();
+            child = children.next();
             return child.xmlTagName;
         }
 
+        @Override
         public XmlNodeBuilder[] processNext(XmlTag tag) throws IOException {
             dumpAttributes(tag, child.attrs);
             return new XmlNodeBuilder[]{
@@ -117,23 +123,21 @@ public class DomXmlNode implements XmlNode {
             };
         }
 
+        @Override
         public void levelDone() {
 
         }
 
-        static private void dumpAttributes(XmlTag tag, Map attrs) throws IOException {
-            Collection collection = attrs.entrySet();
-            for (Iterator iterator = collection.iterator(); iterator.hasNext(); ) {
-                Map.Entry entry = (Map.Entry) iterator.next();
-                tag.addAttribute((String) entry.getKey(), (String) entry.getValue());
+        private static void dumpAttributes(XmlTag tag, Map<String, String> attrs) throws IOException {
+            for (Map.Entry<String, String> entry : attrs.entrySet()) {
+                tag.addAttribute(entry.getKey(), entry.getValue());
             }
         }
     }
 
     public void populateNodeType(NodeType parent) {
         NodeType child = parent.getOrCreate(xmlTagName, this.attrs.keySet());
-        for (Iterator iterator = children.iterator(); iterator.hasNext(); ) {
-            DomXmlNode node = (DomXmlNode) iterator.next();
+        for (DomXmlNode node : children) {
             node.populateNodeType(child);
         }
     }

@@ -82,15 +82,15 @@ public abstract class SaxStackWriterTestCase {
     }
 
     protected static class Category {
-        private String name;
-        private List subCategories;
-        private List contacts;
+        private final String name;
+        private final List<Category> subCategories;
+        private final List<Contact> contacts;
         private String additionalInfo;
 
         public Category(String name) {
             this.name = name;
-            contacts = new ArrayList();
-            subCategories = new ArrayList();
+            contacts = new ArrayList<>();
+            subCategories = new ArrayList<>();
         }
 
         public Category(String name, Contact[] contacts, Category[] categories) {
@@ -103,11 +103,11 @@ public abstract class SaxStackWriterTestCase {
             return name;
         }
 
-        public List getContacts() {
+        public List<Contact> getContacts() {
             return contacts;
         }
 
-        public List getSubCategories() {
+        public List<Category> getSubCategories() {
             return subCategories;
         }
 
@@ -124,23 +124,7 @@ public abstract class SaxStackWriterTestCase {
         }
     }
 
-    protected static class Contact {
-        private String name;
-        private String phone;
-
-        public Contact(String name, String phone) {
-            this.name = name;
-            this.phone = phone;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public String getPhone() {
-            return phone;
-        }
-
+    protected record Contact(String name, String phone) {
     }
 
 

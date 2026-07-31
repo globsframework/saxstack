@@ -3,37 +3,41 @@ package org.globsframework.saxstack.writer;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.StringTokenizer;
 
 public class PathFilter implements Filter {
-    PathInfo path[];
-    int index;
+    private final PathInfo[] path;
+    private int index;
 
     public PathFilter(String path) {
         if (path == null) {
             this.path = null;
         } else {
-            List pathTmp = new ArrayList();
-            for (StringTokenizer tokenizer = new StringTokenizer(path, "/"); tokenizer.hasMoreTokens(); ) {
-                String token = tokenizer.nextToken();
-                int attrIndex = token.indexOf("[");
+            List<PathInfo> pathTmp = new ArrayList<>();
+            for (String token : path.split("/")) {
+                if (token.isEmpty()) {
+                    continue;
+                }
+                int attrIndex = token.indexOf('[');
                 PathInfo pathInfo;
                 if (attrIndex != -1) {
                     pathInfo = new PathInfo(token.substring(0, attrIndex));
                     pathInfo.createEmpty();
-                    for (StringTokenizer attrs = new StringTokenizer(token.substring(attrIndex + 1, token.length() - 1), ",");
-                         attrs.hasMoreTokens(); ) {
-                        pathInfo.add(attrs.nextToken().trim());
+                    for (String attr : token.substring(attrIndex + 1, token.length() - 1).split(",")) {
+                        String trimmed = attr.trim();
+                        if (!trimmed.isEmpty()) {
+                            pathInfo.add(trimmed);
+                        }
                     }
                 } else {
                     pathInfo = new PathInfo(token);
                 }
                 pathTmp.add(pathInfo);
             }
-            this.path = (PathInfo[]) pathTmp.toArray(new PathInfo[pathTmp.size()]);
+            this.path = pathTmp.toArray(new PathInfo[0]);
         }
     }
 
+    @Override
     public XmlTag enter(XmlTag parent, String tagName) throws IOException {
         try {
             if (path == null) {
@@ -55,31 +59,30 @@ public class PathFilter implements Filter {
         }
     }
 
+    @Override
     public void leave() {
         index--;
     }
 
     static class PathInfo {
-        String directoryName;
-        List attrs;
-        public boolean allSubTree;
+        private final String directoryName;
+        private final boolean allSubTree;
+        private List<String> attrs;
 
         public PathInfo(String directoryName) {
             this.directoryName = directoryName;
-            if (directoryName.equals("*")) {
-                allSubTree = true;
-            }
+            this.allSubTree = directoryName.equals("*");
         }
 
         void add(String attr) {
             if (attrs == null) {
-                attrs = new ArrayList();
+                attrs = new ArrayList<>();
             }
             attrs.add(attr);
         }
 
         public void createEmpty() {
-            attrs = new ArrayList();
+            attrs = new ArrayList<>();
         }
 
         public boolean accept(String attrName) {
@@ -111,10 +114,12 @@ public class PathFilter implements Filter {
             this.childTag = childTag;
         }
 
+        @Override
         public String getTagName() {
             return childTag.getTagName();
         }
 
+        @Override
         public XmlTag addAttribute(String attrName, Object attrValue) throws IOException {
             if (path == null) {
                 childTag.addAttribute(attrName, attrValue);
@@ -130,25 +135,30 @@ public class PathFilter implements Filter {
             return this;
         }
 
+        @Override
         public XmlTag addValue(String value) throws IOException {
             childTag.addValue(value);
             return this;
         }
 
+        @Override
         public XmlTag addCDataValue(String value) throws IOException {
             childTag.addCDataValue(value);
             return this;
         }
 
+        @Override
         public XmlTag createChildTag(String tagName) throws IOException {
             return childTag.createChildTag(tagName);
         }
 
+        @Override
         public XmlTag end() throws IOException {
             childTag.end();
             return this;
         }
 
+        @Override
         public XmlTag addXmlSubtree(String xml) throws IOException {
             childTag.addXmlSubtree(xml);
             return this;
