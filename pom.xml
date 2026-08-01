@@ -6,7 +6,7 @@
     <packaging>jar</packaging>
     <artifactId>saxstack</artifactId>
     <name>SAXStack</name>
-    <version>5.0.0</version>
+    <version>5.1-SNAPSHOT</version>
 
     <developers>
         <developer>
@@ -40,7 +40,7 @@
         <connection>scm:git:git@github.com:globsframework/saxstack</connection>
         <developerConnection>scm:git:git@github.com:globsframework/saxstack</developerConnection>
         <url>https://github.com/globsframework/saxstack</url>
-      <tag>5.0.0</tag>
+      <tag>HEAD</tag>
   </scm>
 
     <profiles>
